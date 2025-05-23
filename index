@@ -1,0 +1,8 @@
+export default function Home() {
+  return (
+    <div>
+      <h1>Bienvenido a AI-vatar</h1>
+      <p>Tu plataforma de avatares inteligentes</p>
+    </div>
+  );
+}
