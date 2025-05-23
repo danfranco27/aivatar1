@@ -1,0 +1,37 @@
+// Base de datos: SQLite local
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Cliente de Prisma para Node.js
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Modelo de Usuario
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  avatar    Avatar?
+  createdAt DateTime @default(now())
+}
+
+model Avatar {
+  id        String   @id @default(uuid())
+  name      String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String   @unique   // 👈 Esto soluciona el error
+  agents    Agent[]
+  createdAt DateTime @default(now())
+}
+
+
+// Modelo de Agente
+model Agent {
+  id        String   @id @default(uuid())
+  role      String
+  avatar    Avatar   @relation(fields: [avatarId], references: [id])
+  avatarId  String
+  createdAt DateTime @default(now())
+}
