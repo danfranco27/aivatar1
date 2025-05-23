@@ -1,0 +1,52 @@
+import { useSession, signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+export default function Dashboard() {
+  const { data: session, status } = useSession();
+  const [avatar, setAvatar] = useState(null);
+  const [agents, setAgents] = useState([]);
+
+  useEffect(() => {
+    if (session) {
+      fetchAvatarAndAgents();
+    }
+  }, [session]);
+
+  const fetchAvatarAndAgents = async () => {
+    const res = await axios.get("/api/avatar");
+    setAvatar(res.data.avatar);
+    if (res.data.avatar) {
+      const agentRes = await axios.get("/api/agent");
+      setAgents(agentRes.data.agents);
+    }
+  };
+
+  if (status === "loading") return <p>Cargando...</p>;
+  if (!session) return <p>No estás autenticado.</p>;
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>Bienvenido, {session.user.email}</h1>
+      <button onClick={() => signOut()}>Cerrar sesión</button>
+
+      <h2>Tu Avatar</h2>
+      {avatar ? (
+        <p>🧠 {avatar.name}</p>
+      ) : (
+        <p>No tienes avatar todavía.</p>
+      )}
+
+      <h2>Agentes disponibles</h2>
+      {agents.length === 0 ? (
+        <p>No tienes agentes configurados.</p>
+      ) : (
+        <ul>
+          {agents.map(agent => (
+            <li key={agent.id}>🤖 {agent.role}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
